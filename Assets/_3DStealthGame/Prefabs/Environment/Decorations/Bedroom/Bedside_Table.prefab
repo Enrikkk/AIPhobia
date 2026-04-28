@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 7841992778187616219}
   - component: {fileID: 7014326911536995430}
   - component: {fileID: 449584287834732543}
+  - component: {fileID: 2373869009021307322}
+  - component: {fileID: 3787765777603769388}
   m_Layer: 0
   m_Name: Bedside_Table
   m_TagString: Untagged
@@ -62,6 +64,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -83,9 +87,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &449584287834732543
 BoxCollider:
@@ -108,3 +114,45 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.036939915, y: 0.03559867, z: 0.031851746}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &2373869009021307322
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4384146729215538813}
+  serializedVersion: 5
+  m_Mass: 10
+  m_LinearDamping: 3
+  m_AngularDamping: 1
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 1
+--- !u!114 &3787765777603769388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4384146729215538813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36dcd269bdefbf59ba551c8b2a6a4765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Vacuumable
+  weight: 5
+  hasHealth: 0
+  health: 100

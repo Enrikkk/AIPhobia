@@ -68,6 +68,11 @@ namespace StealthGame
             }
         }
 
+        public void WinGame()
+        {
+            this.m_IsPlayerAtExit = true;
+        }
+
         void EndLevel (VisualElement element, bool doRestart, AudioSource audioSource)
         {
             m_Demo_GameTimerIsTicking = false;

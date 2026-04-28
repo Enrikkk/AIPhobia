@@ -34,9 +34,18 @@ namespace StealthGame
 
         void Start()
         {
-            m_FlickeringMaterial = flickeringRenderer.material;
-            m_FlickeringMaterial.EnableKeyword(k_EmissionName);
-            m_EmissionColor = m_FlickeringMaterial.GetColor(k_EmissionColorID);
+            if (flickeringRenderer != null)
+            {
+                m_FlickeringMaterial = flickeringRenderer.material;
+                m_FlickeringMaterial.EnableKeyword(k_EmissionName);
+                m_EmissionColor = m_FlickeringMaterial.GetColor(k_EmissionColorID);
+            }
+
+            if (flickeringLight == null && flickeringRenderer == null)
+            {
+                Debug.LogWarning($"[LightFlicker] '{name}' has no Light AND no Renderer assigned — disabling.", this);
+                enabled = false;
+            }
         }
 
         void Update()
@@ -54,9 +63,12 @@ namespace StealthGame
             {
                 ChangeAnimatedFlickerLightIntensity ();
             }
-            
-            flickeringLight.intensity = m_FlickerLightIntensity;
-            m_FlickeringMaterial.SetColor (k_EmissionColorID, m_EmissionColor * m_FlickerLightIntensity * k_LightIntensityToEmission);
+
+            if (flickeringLight != null)
+                flickeringLight.intensity = m_FlickerLightIntensity;
+
+            if (m_FlickeringMaterial != null)
+                m_FlickeringMaterial.SetColor (k_EmissionColorID, m_EmissionColor * m_FlickerLightIntensity * k_LightIntensityToEmission);
         }
 
         void ChangeRandomFlickerLightIntensity ()

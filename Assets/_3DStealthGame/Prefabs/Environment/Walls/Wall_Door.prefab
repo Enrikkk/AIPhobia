@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6370890705336211443}
   - component: {fileID: 7006575578281653090}
+  - component: {fileID: 3905705733995268308}
   m_Layer: 0
   m_Name: Wall_Door
   m_TagString: Untagged
@@ -55,6 +56,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.46565697, y: 2.335113, z: 0.40822503}
   m_Center: {x: -0.034598067, y: -0.012999833, z: -0.020200506}
+--- !u!114 &3905705733995268308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4300594233165176540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 1
+  m_Area: 1
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1001 &232716211581330853
 PrefabInstance:
   m_ObjectHideFlags: 0

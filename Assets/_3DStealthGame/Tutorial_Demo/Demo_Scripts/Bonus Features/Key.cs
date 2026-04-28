@@ -9,13 +9,13 @@ namespace StealthGame
 
         private void OnTriggerEnter(Collider other)
         {
-            PlayerMovement player = other.gameObject.GetComponent<PlayerMovement>();
-
-            //this wasn't a player
-            if (player == null)
+            // Search the whole player hierarchy — the collider that triggers may be
+            // a child object (e.g. CharacterController capsule), not the root with the script.
+            PlayerKeys keys = other.GetComponentInParent<PlayerKeys>();
+            if (keys == null)
                 return;
-        
-            player.AddKey(KeyName);
+
+            keys.AddKey(KeyName);
             Destroy(gameObject);
         }
     }

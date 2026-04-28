@@ -61,7 +61,7 @@ PrefabInstance:
     - target: {fileID: 666602370706033372, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
         type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
         type: 3}
@@ -71,7 +71,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
         type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4278200481962586376, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
         type: 3}
@@ -86,7 +86,7 @@ PrefabInstance:
     - target: {fileID: 8487167654232718067, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
         type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -96,6 +96,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8296162131472133739}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 183732935694145056}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b82cd7e9460cc44b99238b70bcb8a35,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8270333414054728337}
   m_SourcePrefab: {fileID: 100100000, guid: 4b82cd7e9460cc44b99238b70bcb8a35, type: 3}
 --- !u!1 &4781276516186756198 stripped
 GameObject:
@@ -124,3 +132,45 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5300283, y: 0.6619065, z: 0.5326185}
   m_Center: {x: 0.0026676357, y: 0.31079245, z: 0.0020737797}
+--- !u!114 &183732935694145056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4781276516186756198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36dcd269bdefbf59ba551c8b2a6a4765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Vacuumable
+  weight: 5
+  hasHealth: 0
+  health: 100
+--- !u!54 &8270333414054728337
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4781276516186756198}
+  serializedVersion: 5
+  m_Mass: 5
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

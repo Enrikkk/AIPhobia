@@ -5,7 +5,7 @@ public class VacuumTool : MonoBehaviour
 {
     [Header("Vacuum Properties")]
     public float suctionRange = 10f;
-    public float suctionPower = 2f; // Strenght of the vacuum.
+    public float suctionPower = 0.5f; // Strenght of the vacuum.
 
     [Header("Connections")]
     public Transform playerCamera; 
@@ -78,19 +78,12 @@ public class VacuumTool : MonoBehaviour
             }
         }
 
-        Debug.DrawRay(playerCamera.position, playerCamera.forward * suctionRange, Color.red);
-
         RaycastHit reachedObj;
         if(Physics.Raycast(playerCamera.position, playerCamera.forward, out reachedObj, suctionRange))
         {
-            Debug.Log("Vacuum is sucking: " + reachedObj.transform.name); // See which object we are vacuuming.
-
-            Vacuumable target = reachedObj.transform.GetComponent<Vacuumable>();
-            if(target != null) 
+            Vacuumable target = reachedObj.transform.GetComponentInParent<Vacuumable>();
+            if(target != null)
             {
-                Debug.Log("Pulling object: " + reachedObj.transform.name);
-                // Vacuum the object (if vacuumable) to actual position, using actual suction power and calculating the distance multiplier as the distance 
-                // from the player to the object, normalized by the suction range.
                 target.GetVacuumed(vacuumModel.position, suctionPower, 1f - (Vector3.Distance(playerCamera.position, reachedObj.point) / suctionRange));
             }
         }

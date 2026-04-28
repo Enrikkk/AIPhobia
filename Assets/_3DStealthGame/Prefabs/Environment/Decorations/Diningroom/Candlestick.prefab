@@ -11,15 +11,13 @@ GameObject:
   - component: {fileID: 4740932143925240}
   - component: {fileID: 33640611416656746}
   - component: {fileID: 23531020412078802}
-  - component: {fileID: 3735086676344863395}
-  - component: {fileID: 7078475771320032611}
   - component: {fileID: 4765072611205554964}
   m_Layer: 0
   m_Name: Candlestick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 23
   m_IsActive: 1
 --- !u!4 &4740932143925240
 Transform:
@@ -97,48 +95,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!54 &3735086676344863395
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1559196646925328}
-  serializedVersion: 5
-  m_Mass: 8
-  m_LinearDamping: 3
-  m_AngularDamping: 1
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 0
-  m_CollisionDetection: 1
---- !u!114 &7078475771320032611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1559196646925328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36dcd269bdefbf59ba551c8b2a6a4765, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Vacuumable
-  weight: 3
-  hasHealth: 0
-  health: 100
 --- !u!65 &4765072611205554964
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -187,7 +143,7 @@ Transform:
   m_GameObject: {fileID: 2530602368756039216}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.027, y: 0.797, z: 0.009}
+  m_LocalPosition: {x: 0.027, y: 0.71, z: 0.009}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -203,14 +159,14 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 2
-  m_Color: {r: 0.9716981, g: 0.82760435, b: 0.61877, a: 1}
-  m_Intensity: 0.5
-  m_Range: 1.28
+  m_Color: {r: 0.972549, g: 0.80488145, b: 0.61960787, a: 1}
+  m_Intensity: 0.44
+  m_Range: 0.75
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -375,6 +331,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 148138630593449358, guid: a24956b5a0e552047a522ea09e794d95,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -473,6 +434,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 148138630593449358, guid: a24956b5a0e552047a522ea09e794d95,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
