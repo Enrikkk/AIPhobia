@@ -1,52 +1,381 @@
-# AIPhobia 
+# AIPhobia
 
-**Developer:** Enrique Hernández Noguera 
+**Developer:** Enrique Hernández Noguera
+**Course:** AI in Gaming — Second Semester
+**Engine:** Unity (URP, NavMesh, New Input System, Cinemachine, TextMesh Pro)
 
-## Overview
-**AIPhobia** is a completely AI-based game centered around a ghost hunting theme. While drawing primary inspiration from the popular horror game *Phasmophobia* , AIPhobia streamlines the experience into a more direct, combat-oriented single-scenario encounter. Rather than using realistic horror graphics, the project targets a more colorful, low-poly, and cartoonish "Ghostbusters" art style. 
+---
 
-To optimize the estimated 100-hour development cycle over 14 weeks  and avoid spending excessive hours building a map from scratch, the game environment repurposes the layout from the classic Unity "John Lemon's Haunted Jaunt" tutorial. This allows the primary development focus to remain on AI systems, physics mechanics, and game design.
+## What Is AIPhobia?
 
-## Core Gameplay & Objectives
-The game is built upon an asymmetric struggle between two entities: the Ghost Hunter and the Ghost. The player can choose to control either character, while a real-time autonomous AI agent controls the opponent.
+AIPhobia is a first-person ghost-hunting game built in Unity, taking direct inspiration from *Phasmophobia* and reinterpreting it through a more colorful, action-oriented lens. Rather than the slow burn of investigation, AIPhobia drops the player directly into a haunted house for a tense one-on-one showdown: you have a vacuum and a lantern, the ghost has seven behavioral states and an ectoplasm cannon, and only one of you is walking out.
 
-* **The Ghost Hunter:** The hunter's objective is to explore the haunted house, interact with elements to find the ghost, and successfully capture it using a specialized ghost vacuum. However, the hunter must act quickly, as their fear levels will constantly increase over time and spike when subjected to scares. The hunter utilizes a linear equipment loadout, primarily a flashlight and the vacuum tool.
-* **The Ghost:** The ghost's objective is to protect its home by terrifying the hunter into fleeing. The ghost can scare the player through poltergeist activity (moving objects, closing doors, turning on lights), floating through walls, or physically appearing in front of the player—a high-risk move that maximizes fear but leaves the ghost vulnerable to the vacuum.
+The art style deliberately echoes classic *Ghostbusters* — low-poly geometry, vivid ambient lighting, and cartoonish projectiles — keeping the tone spooky but not distressing. The environment reuses the layout from Unity's "John Lemon's Haunted Jaunt" tutorial, which freed development time to focus on what the class cares about: AI systems, physics mechanics, and game feel.
 
-## Technical Implementation: Under the Hood
-The project is being developed using Unity as the game engine , with Visual Studio for C# scripting , and GitHub for version control. Additional assets are processed using Blender  and Audacity.
+The ghost is driven entirely by a handwritten Finite State Machine. It patrols when idle, investigates sounds when the player makes noise, gives chase on line-of-sight, hurls glowing ectoplasm when close enough, and phases through walls to flee when threatened. The player's only weapon is the vacuum — but the ghost fights back.
 
-### 1. The Tool Management System
-The player's loadout is controlled by a centralized `ToolChanger` script. The system listens for numeric keystrokes (1, 2, 3) to synchronize the active 3D tool models with a 2D Canvas hotbar. When a tool is deactivated, it gracefully disables its localized components (stopping particles and audio) to prevent memory leaks and overlapping logic.
+---
 
-### 2. The Lantern Tool
-The Lantern acts as the player's primary navigational aid. 
-* **State Memory:** Because the entire Lantern GameObject is enabled/disabled by the Tool Manager, the child light source inherently remembers its last state (On or Off) when the tool is re-equipped.
-* **Audio:** It uses the `PlayOneShot` method to trigger distinct mechanical "click" sounds for powering up and powering down without interrupting other ambient audio.
+## Objectives
 
-### 3. The Vacuum Tool (Core Mechanic)
-The Vacuum is the mechanical centerpiece of the project, designed with a heavy emphasis on "Game Feel" and physics manipulation.
-* **Raycasting & Targeting:** When activated, the vacuum fires an invisible Raycast from the center of the camera. This ray calculates the exact distance between the player and the target, generating a normalized distance multiplier (1.0 at point-blank range, scaling down at a distance).
-* **Procedural Animation & Audio:** Instead of static keyframed animations, the script uses `Random.insideUnitSphere` to rapidly calculate random localized vectors, creating a procedural "rumble." A mathematical smoothing function (`Mathf.MoveTowards`) creates a realistic "spin-up" and "spin-down" effect that dynamically bends the pitch and volume of the vacuum's `AudioSource`.
-* **Particle VFX:** A custom Particle System simulates a swirling vortex utilizing volume-based emission, orbital velocity, and negative radial velocity to enforce a tight suction cone shape.
+### How to Win
+Vacuum the ghost down to zero HP. Every Vacuumable object with health registers itself with `GhostManager` on startup. When its HP hits zero, `Vacuumable.Die()` calls `GhostManager.RemoveGhost()`. Once all ghosts are gone, `GhostManager` fires `GameEnding.WinGame()` and the win screen fades in.
 
-### 4. The Universal `Vacuumable` Physics System
-To prevent redundant code, interactions are handled by a single `Vacuumable` master script attached to interactable GameObjects. 
-* **Rigidbodies (Furniture):** If a `Rigidbody` is detected, the script calculates a directional vector toward the player and applies raw force (`AddForce`). This allows Unity's internal physics engine to handle gravity and Linear Damping (friction), resulting in objects realistically dragging and scraping across the floor.
-* **Transforms (Entities/Ghosts):** If no Rigidbody is present, the script defaults to a `Vector3.MoveTowards` translation to pull the entity through the air.
+### How to Lose
+Let your Scared Bar fill up completely. The bar has a maximum of **1300 fear units**. It fills passively over time, accelerates while the ghost is visible, and spikes instantly when an ectoplasm projectile hits you. When the bar reaches max, `ScaredMeter` calls `GameEnding.CaughtPlayer()` and the lose screen takes over.
 
-## Current State and Known Issues (Midterm Milestone)
-As of the Midterm milestone (February 27), the project has successfully achieved its "Graybox" prototype goals. The basic gameplay loop is functional, the player can move, the flashlight operates, the ghost can randomly wander via pathfinding, and the foundational catch mechanics exist. 
+---
 
-However, the project is currently in a heavy tuning and debugging phase:
-* ⚠️ **Physics Pulling (Work in Progress):** The logic for vacuuming physics-based furniture is implemented, but the exact interaction between the vacuum's applied force multiplier and Unity's Linear Damping/Mass properties is currently unstable. Objects may not move at the intended speeds and require further tuning.
-* ⚠️ **Entity Combat (Untested Logic):** The math to drain a Ghost's Health Points (HP) based on proximity has been fully written into the `Vacuumable` script. However, this "tug-of-war" combat mechanism has not yet been playtested against the live enemy AI in the build. The logic is present, but the gameplay loop requires practical execution.
+## Controls
 
-## Future Development Roadmap
-Moving forward, the development timeline is structured around the following milestones:
+| Input | Action |
+|-------|--------|
+| `W A S D` | Move |
+| Mouse | Look around |
+| `Left Click` | Use equipped tool (vacuum fire / lantern toggle) |
+| `1` | Equip Vacuum |
+| `2` | Equip Lantern |
+| `3` | Equip third tool slot |
+| `Mouse Wheel` | Cycle through tools |
+| Press active tool key again | Deselect tool (empty hands) |
+| `E` | Interact (pick up keys, open doors) |
 
-* **March 27 - The "Brain" Update:** Implementation of robust Finite State Machines for the AI. The Ghost AI will transition between Idle, Stalk, Spook, and Flee states based on sensory input, while the Hunter AI will feature Explore, Chase, Inspect, and Attack modes. Furthermore, a dynamic experience management system is planned to adjust AI aggression based on player performance.
-* **April 24 - The "Juice" Update:** Integration of final low-poly models, textures, critical audio feedback loops, and UI elements (Fear Meter, HUD, Menus). Initial development of a multi-agent system may begin here.
-* **May 6 - Polish & Balancing:** The final weeks will focus strictly on numerical balancing (fear meter fill rates, ghost difficulty) and finalizing any multi-agent interactions.
+---
 
-**Scope Management:** If the project falls behind schedule, planned scope reductions include cutting the dynamic difficulty balancing, relying on basic polygonal art rather than custom assets, and completely abandoning the multiplayer/multi-agent systems.
+## Features
+
+### Ghost AI — 7-State Finite State Machine
+
+The ghost brain (`GhostAI.cs`) is a handwritten FSM with seven distinct behavioral states. Each state has its own update loop, its own transition conditions, and in some cases its own NavMesh speed and movement mode.
+
+**States and Transitions:**
+
+| State | Behavior | Exits To |
+|-------|----------|----------|
+| **Wander** | Picks random NavMesh points and patrols | Chase (sees player), Investigate (hears player), Flee (being vacuumed), Hide (low health) |
+| **Investigate** | Moves to last known player position, times out | Chase (sees player), Wander (timeout), Flee, Hide |
+| **Chase** | Sprints directly toward player via NavMesh | Spook (in range + cooldown), Flee (vacuumed), Hide (low health), Investigate (LOS lost but nearby), Wander (LOS lost, far) |
+| **Spook** | Stops, winds up, throws ectoplasm | Flee (after throw + 0.3s delay) |
+| **Flee** | Disables NavMeshAgent, phases through walls | Chase or Wander (once far enough from player) |
+| **Hide** | Navigates to a distant NavMesh corner | Hidden (on arrival) |
+| **Hidden** | Slow wanders in hiding area | Hide (player gets close again) |
+
+**Vision System (`CanSeePlayer`):**
+Vision is checked with a two-part test: first a field-of-view cone (default **110° full width**, **15f range**), then a layer-agnostic raycast. The raycast casts toward the player and hits the very first solid collider in the way. If that first hit is the player, LOS is confirmed; if anything else (wall, door, furniture) is in between, the ghost is blocked. This design avoids layer dependency bugs where door prefabs on the wrong layer would pass the raycast silently.
+
+**Hearing System (`IsPlayerNearby`):**
+The ghost hears the player only when the player is actively moving (via the `PlayerNoise.isEmittingNoise` flag). A stationary player is completely silent. In open air the hearing radius is **8f**. If a solid object is between the ghost and player (detected via a secondary raycast), the effective radius drops to **4f** — the ghost hears muffled sounds through walls but at much shorter range.
+
+**Flee Mechanics:**
+When the ghost enters FLEE, its `NavMeshAgent` is disabled entirely and it moves via `Vector3.MoveTowards` directly on the Transform — this is what lets it pass through walls. `UpdateFlee()` picks a flee target in the opposite direction from the player, moves toward it, and chains new flee legs if it reaches the target before escaping. When the ghost is finally far enough from the player, it calls `NavMesh.SamplePosition` to find the nearest legal NavMesh point, snaps `transform.position` to it (before re-enabling the agent, since enabling inside geometry causes agent creation errors), then calls `agent.Warp()` to sync the agent's internal state. Flee rotation is handled with `Quaternion.RotateTowards` at a fixed deg/sec rate so the ghost always faces the direction it's sliding — no more sideways hockey-puck movement.
+
+**Hide Mechanics:**
+At low health (below 25% by default), the ghost navigates to a distant corner of the map (`hideBiasRange` pushes the target selection far away). On arrival it enters HIDDEN and slow-wanders. Its hearing radius expands to **14f** in this state so it can react to players who found it.
+
+**Vacuum Latch:**
+`isBeingVacuumed` is a computed property rather than a flag: it returns true if `(Time.time - lastVacuumedTime) < vacuumLatchTime` (default **0.2s**). This means the ghost reacts to being vacuumed for a fraction of a second after the vacuum leaves it, preventing one-frame flicker between states.
+
+---
+
+### Scared Bar — Fear Meter
+
+The player's fear level is tracked by `ScaredMeter.cs`, a MonoBehaviour on the Player GameObject that drives both the game-over condition and the fill of the Scared Bar UI.
+
+**Fill Sources:**
+
+| Source | Rate / Amount |
+|--------|---------------|
+| Passive fill | 4 fear/second — always running |
+| Ghost is visible | +8 fear/second (stacked on passive) |
+| Ectoplasm projectile hit | +150 fear (instant) |
+| Ghost kill reward | −`killFearReduction` (one-shot on ghost death, default tuned in Inspector) |
+
+**`CanPlayerSeeGhost()`** is called every frame to determine whether the visibility bonus applies. It performs a two-part check: the ghost must be within the player camera's forward FOV cone AND an unobstructed raycast from the camera to the ghost must succeed (using the Walls layer mask). If either fails, the visibility bonus is not applied.
+
+**Game Over:** When `currentFear >= maxFear` (1300), `ScaredMeter` sets a `gameover` flag to prevent double-triggers and calls `gameEnding.CaughtPlayer()`.
+
+**Scared Bar UI:**
+The bar uses a two-layer Canvas pattern. `ScaredBar_BG` is a static decorative image (custom art, transparent background). `ScaredBar_Fill` sits on top with `Image Type: Filled, Fill Method: Horizontal, Origin: Left`. `ScaredMeter.UpdateBar()` sets `fillAmount = currentFear / maxFear` every frame. The fill color visually communicates danger level.
+
+---
+
+### Ectoplasm Projectile
+
+When the ghost enters its Spook state and the windup timer expires, `GhostAI.ThrowEctoplasm()` instantiates the `EctoplasmProjectile` prefab at the `ThrowOrigin` child Transform and calls `projectile.Launch(playerPosition)`.
+
+**Parabolic Arc:**
+The projectile computes its trajectory in `Update()` using a parametric approach. Time `t` is normalized from 0 to 1 over `flightDuration` (1.5s). The horizontal position is a simple linear lerp between `startPosition` and `targetPosition`. The vertical offset is `Sin(t * PI) * arcHeight` — this gives zero height at launch, a peak at the midpoint, and zero again at landing, creating a smooth natural arc without any physics engine involvement. `arcHeight` defaults to **2.5f**.
+
+**Collision:**
+`OnTriggerEnter` fires when the projectile's SphereCollider (Is Trigger = true) overlaps something. If the other collider is tagged `"Player"`, `targetMeter.AddFear(ectoplasmHit)` is called and the projectile destroys itself. If the collider is a solid non-trigger, the projectile is destroyed without effect.
+
+**Prefab:**
+The projectile is a green emissive sphere (URP Lit material with emission enabled). The `targetMeter` reference is assigned at runtime by GhostAI when the projectile is instantiated — the Inspector field is left blank in the prefab.
+
+---
+
+### Vacuum Tool
+
+The vacuum (`VacuumTool.cs`) is the player's only weapon and the central mechanical loop of the game. Left-click fires a continuous beam; releasing stops it.
+
+**Targeting:**
+Each frame while active, a raycast fires from the camera center forward up to `suctionRange` (10f). If the ray hits a collider with a `Vacuumable` component, `GetVacuumed(vacuumModel.position, suctionPower, distanceMult)` is called. The distance multiplier is normalized: 1.0 at point-blank, decreasing toward zero at max range, so the vacuum is strongest when you are close.
+
+**Procedural Shake Animation:**
+The vacuum model does not use keyframed animation. Instead, `currentShakeWeight` ramps up from 0 to 1 over time using `Mathf.MoveTowards` at `motorRampSpeed` while firing, and ramps back to 0 when released. Each frame, the model's local position is offset by `Random.insideUnitSphere * maxShakeIntensity * currentShakeWeight` — rapid random vectors that create a convincing mechanical rumble that scales with activation level.
+
+**Audio:**
+The vacuum motor (`vacuum_motor.wav`) loops on an AudioSource. Its `pitch` and `volume` are both driven by `currentShakeWeight`, so the motor spins up audibly as you hold the trigger and winds down smoothly when you release. This is the same "spin-up/spin-down" ramp used for the visual shake.
+
+**Particle VFX:**
+A Particle System child of the vacuum model plays automatically when the vacuum is activated and stops when released, producing a visible suction cone effect in front of the nozzle.
+
+---
+
+### Vacuumable Physics System
+
+`Vacuumable.cs` is a universal component that turns any GameObject into something the vacuum can interact with. Attach it to furniture, props, or the ghost.
+
+**Two Pull Modes:**
+- **Rigidbody objects (furniture):** `GetVacuumed()` calls `rb.AddForce(direction * basePower * distanceMultiplier * 20f)`. Unity's physics engine then handles mass, linear damping, and gravity — objects slide and drag across the floor realistically.
+- **Non-Rigidbody objects (ghost):** `Vector3.MoveTowards` translates the Transform directly toward the vacuum at `(basePower / weight) * distanceMult`, bypassing the physics engine for predictable enemy movement.
+
+**Health and Damage:**
+When `hasHealth = true` (set on the ghost), the object takes damage every frame it is being vacuumed. A world-space health bar Image scales its width in proportion to remaining HP via `updateHealthBarUI()`.
+
+**Death:**
+When `health <= 0`, `Die()` runs:
+1. Finds the player's `ScaredMeter` via `Object.FindAnyObjectByType` and calls `ReduceFear(killFearReduction)` — a fear reward for the kill.
+2. Calls `GhostManager.Instance.RemoveGhost()` — decrements the ghost counter and potentially triggers the win condition.
+3. Calls `Destroy(gameObject)`.
+
+**Editor Utility (`VacuumableSetup.cs`):**
+A custom menu under `AIPhobia/` in the Unity Editor lets you batch-convert any selected GameObjects (or their backing prefab assets) into vacuumable props. It adds `BoxCollider`, `Rigidbody` (with tuned mass/damping/interpolation/CCD settings), and `Vacuumable` in one click. A reverse option removes them and restores Static flags.
+
+---
+
+### Lantern Tool
+
+`LanternTool.cs` manages a toggleable spotlight carried by the player.
+
+Left-clicking while the lantern is equipped toggles the spotlight on or off. Each toggle plays a distinct `PlayOneShot` audio clip — `flashlight_click_on.mp3` or `flashlight_click_off.mp3` — without interrupting any ambient audio loops.
+
+Because the entire Lantern GameObject is enabled/disabled by the `ToolChanger` when switching tools, the spotlight child naturally inherits its parent's disabled state when the tool is put away. When the lantern is re-equipped, it restores whichever on/off state it was in — the light remembers where it left off without any extra state management.
+
+The lantern model (along with the vacuum model) is assigned to a custom **Weapon layer** so it can be rendered by the dedicated Weapon Camera with a very close near clip plane. This prevents the cylindrical clipping artifact that occurs when first-person tool models get too close to a camera with a standard near plane.
+
+---
+
+### Tool Management System
+
+`ToolChanger.cs` (in `Assets/Package/`) is the active tool manager. It controls which tool is active at any moment and keeps the 3D GameObjects in sync with the 2D hotbar HUD.
+
+**Input:**
+- **Mouse Wheel:** Cycles through the tool array with wraparound.
+- **Keys 1/2/3:** Jump directly to a tool slot.
+- **Same key twice:** Deactivates the current tool (index -1, empty hands).
+
+**Sync:**
+`ToolChanger` holds three parallel arrays: `toolObjects[]` (3D GameObjects to enable/disable), `toolFrames[]` (UI Image borders), and `toolIcons[]` (UI Graphics). On each switch, `SwitchTool(index)` enables the matching 3D GameObject, disables the rest, and calls `UpdateUI()` to tint the selected frame and icon bright while dimming all others. This gives immediate visual feedback about which tool is held.
+
+`ToolSwitcher.cs` is an earlier, simpler version of the same idea — it handles 3D switching but has no UI sync. It remains in the project as reference.
+
+---
+
+### Key & Door Interaction System
+
+The interaction system is built around a small interface pattern that makes any object in the scene interactable with a single E keypress.
+
+**`IInteractable` Interface:**
+```
+string GetPrompt(GameObject interactor)  — returns the on-screen hint text
+void   Interact(GameObject interactor)   — executes the interaction
+```
+Any MonoBehaviour implementing this interface can be found and triggered by `PlayerInteractor`.
+
+**`PlayerInteractor.cs`:**
+Every frame, a `SphereCast` fires from the player camera forward with a radius of **0.3f** and a max distance of **2f** — a "fat" raycast that forgives imprecise aim, similar to how Phasmophobia handles interaction targeting. When an `IInteractable` is in range, its `GetPrompt()` result is displayed on the `PromptLabel` TMP_Text. When the player presses `E`, `Interact(gameObject)` is called. The prompt root GameObject shows and hides automatically as the player aims at and away from interactables.
+
+**`PlayerKeys.cs`:**
+A simple key inventory stored as a `HashSet<string>` on the Player root. `AddKey(name)` and `OwnKey(name)` provide O(1) insert and lookup.
+
+**`InteractableDoor.cs`:**
+Implements `IInteractable`. Serialized fields: `requiredKey` (string), `lockedPrompt`, `unlockedPrompt`. `GetPrompt()` returns the locked or unlocked text depending on whether the player owns the key. `Interact()` checks `PlayerKeys.OwnKey(requiredKey)` and, if matched, destroys the door GameObject.
+
+**`Key.cs`:**
+A trigger pickup. `OnTriggerEnter` finds `PlayerKeys` via `GetComponentInParent` (supporting any player hierarchy depth) and calls `AddKey(KeyName)`, then destroys itself.
+
+---
+
+### Hearing & Footstep System
+
+The hearing system gives the ghost audio-based awareness of the player and gives the player audible feedback for their movement — and the information that moving makes them detectable.
+
+**`PlayerNoise.cs`:**
+Attached to the Player, this component monitors horizontal velocity via `CharacterController.velocity` each frame. When the XZ magnitude exceeds `moveThreshold` (0.1f), `isEmittingNoise` is set to true. A step timer increments each frame while moving and fires `PlayFootstep()` every `stepInterval` (0.45s). `PlayFootstep()` picks a random clip from the `footstepClips` array (10 distinct footstep variants) and plays it via `PlayOneShot` — no two steps sound identical. The footstep AudioSource has **Spatial Blend = 1** (full 3D), so sound falloff and directionality apply.
+
+**Ghost Hearing Integration (`GhostAI.IsPlayerNearby`):**
+`IsPlayerNearby()` now gates on `playerNoise.isEmittingNoise` before doing any distance check. A stationary player is completely invisible to the ghost's hearing. Only a moving player triggers the proximity detection.
+
+**Wall Attenuation:**
+Inside `IsPlayerNearby()`, after confirming the player is within range, a secondary raycast fires from the ghost toward the player (layer-agnostic, ignoring triggers). If the ray hits anything solid before reaching the player, the effective hearing radius drops from `nearbyRadius` (**8f**) to `throughWallHearingRadius` (**4f**). The ghost can hear a moving player through walls, but only if they are very close.
+
+**Net Effect:**
+The player can stand completely still next to a door the ghost is behind and the ghost will have no audio awareness of them. The moment they take a step, the ghost hears them (at reduced range if a wall is between them). This creates deliberate stealth gameplay: slow, careful movement near the ghost is significantly safer than sprinting.
+
+---
+
+### Multi-Ghost Win Condition
+
+`GhostManager.cs` is a singleton MonoBehaviour that tracks how many vacuumable entities with health remain alive and determines when the game is won.
+
+**Registration:**
+`Vacuumable.Start()` calls `GhostManager.Instance.AddGhost()` when `hasHealth = true`. This means any number of ghosts can be placed in the scene and they self-register automatically at runtime.
+
+**Deregistration:**
+`Vacuumable.Die()` calls `GhostManager.Instance.RemoveGhost()`. `RemoveGhost()` decrements the count (clamped to 0), refreshes the HUD label, and if `numGhosts == 0` calls `gameEnding.WinGame()`.
+
+**Ghost Counter HUD:**
+A `TextMeshProUGUI` component (font: `Eater-Regular SDF` for thematic styling) displays "Ghosts Left: N" in the corner of the screen. `GhostManager.UpdateUI()` updates it every time the count changes.
+
+**Singleton Guard:**
+`Awake()` checks whether an `Instance` already exists. If one does (e.g., from a scene reload), the duplicate destroys itself immediately.
+
+---
+
+### Atmosphere, Lighting & Visuals
+
+The environment is the John Lemon tutorial house, redesigned for a darker horror atmosphere.
+
+**Ceilings:**
+All rooms originally had open tops. Ceilings were added by duplicating each floor mesh, raising it to ceiling height, and rotating 180° on the X axis so the face normals point downward into the room. No new materials or shaders were needed — existing floor materials render correctly on both surfaces.
+
+**Lighting:**
+All in-scene light prefabs (`Light.prefab`, `Flickering_Light.prefab`, `Candlestick.prefab`) had their intensities significantly reduced. The Environment Lighting Source was switched away from the default skybox (which was acting as ambient and pouring daylight-level blue through every window opening) to a dark cool ambient color. The result is a house where most corridors are in near-total darkness, pools of candlelight are isolated and meaningful, and the player's lantern feels genuinely necessary.
+
+**`LightFlicker.cs`:**
+Atmospheric lights use a two-mode flicker component. In **Random mode**, intensity snaps to a random value within a configurable range at a configurable interval. In **AnimationCurve mode**, intensity follows a designer-authored curve looped over time. The component drives both the Light component's intensity and the mesh renderer's emission color in lockstep, so there is no mismatch between the visible flame and the cast light. A custom Inspector hides the irrelevant controls depending on which mode is selected.
+
+**Fog Shaders:**
+Two Shader Graph assets (`FogPlane.shadergraph`, `FogSphere.shadergraph`) produce animated scrolling fog with noise-based turbulence and an orange-yellow color. `FogPlane` uses Render Face: Front for flat ground fog around the map exterior. `FogSphere` uses Render Face: Back to render from inside a sky dome sphere — the viewer is inside the dome looking out at the fog walls.
+
+**Dual-Camera Weapon Rendering:**
+First-person tool models need a very close near clip plane (0.01f) to avoid showing geometry cutoffs right in front of the camera. The world camera, however, needs a larger near plane (0.3f) for adequate Z-buffer precision across the full scene depth. The solution is two cameras on the same rig:
+- **Main Camera** renders everything except the **Weapon** layer. Near clip: **0.3f**.
+- **Weapon Camera** (child of Main Camera) renders only the **Weapon** layer. Clear Flags: Depth Only. Depth: Main+1. Near clip: **0.01f**.
+
+Lantern and vacuum models are assigned to the `Weapon` layer. The Main Camera's culling mask excludes it. The two cameras composite automatically — tools render crisply at any distance without any clipping artifact.
+
+---
+
+### UI System
+
+AIPhobia uses two distinct UI technologies: **Unity UI Toolkit** (UIDocument + UXML + USS) for the main menu and end screens, and **uGUI Canvas** for the in-game HUD.
+
+**Main Menu:**
+`MainMenu.cs` queries a UIDocument root for `StartButton` and `ExitButton` VisualElements. Start loads the game scene via `SceneManager.LoadScene(1)`; Exit calls `Application.Quit()`. The layout is defined in `Demo_MainMenu.uxml`. Button hover states are handled in `MainMenuUSS.uss` with a `scale: 1.05` transform and a 0.1s transition — no script needed for the animation.
+
+**Win / Lose Screens:**
+`GameEnding.cs` queries the UIDocument for `EndScreen` (win) and `CaughtScreen` (lose) VisualElements. On trigger, the appropriate element fades in over `fadeDuration` seconds while the matching audio sting plays. A visible in-game timer (`Demo_TimerLabel`) tracks elapsed play time and is shown on the end screen.
+
+**In-Game HUD (Canvas):**
+| Element | Script | Notes |
+|---------|--------|-------|
+| Scared Bar BG | — | Static decorative art; custom-generated PNG |
+| Scared Bar Fill | `ScaredMeter` | `Image Type: Filled, Horizontal, Left`; `fillAmount` driven per frame |
+| Ghost Health Bar | `Vacuumable` | Width scaled by HP ratio |
+| Ghost Counter | `GhostManager` | TMP_Text, `Eater-Regular SDF` font |
+| Hotbar Frames + Icons | `ToolChanger` | Color tint changes on active selection |
+| Interaction Prompt | `PlayerInteractor` | Shows/hides based on what player aims at |
+
+---
+
+### Audio Design
+
+All audio in AIPhobia uses `PlayOneShot` or looped AudioSources rather than pre-baked ambience, keeping runtime memory low and giving each sound direct gameplay meaning.
+
+| Sound | File | How It Plays |
+|-------|------|-------------|
+| Lantern on | `flashlight_click_on.mp3` | `PlayOneShot` on toggle |
+| Lantern off | `flashlight_click_off.mp3` | `PlayOneShot` on toggle |
+| Vacuum motor | `vacuum_motor.wav` | Looping AudioSource; pitch + volume scaled by `currentShakeWeight` |
+| Footsteps | `footstep1.mp3` – `footstep10.mp3` | Random `PlayOneShot` from 10-variant pool; 3D spatial, fires every 0.45s while moving |
+
+The footstep system uses ten distinct clips to avoid the "machine-gun" effect that occurs when a single looped footstep sound repeats at regular intervals. Each step randomly selects from the pool, so no two consecutive steps sound exactly alike.
+
+---
+
+### Player Setup
+
+The player is built on Unity's **Starter Assets FirstPersonController**, which uses a `CharacterController` for movement, Cinemachine for the virtual camera rig, and the new Input System for input binding.
+
+**Component Stack on the Player GameObject:**
+
+| Component | Purpose |
+|-----------|---------|
+| `FirstPersonController` | WASD movement + mouse look |
+| `ToolChanger` | Tool switching and HUD sync |
+| `LanternTool` | Lantern toggle and audio |
+| `VacuumTool` | Vacuum firing, shake, particles, audio |
+| `ScaredMeter` | Fear accumulation and game-over detection |
+| `PlayerInteractor` | E-press interaction SphereCast |
+| `PlayerKeys` | Key inventory (HashSet) |
+| `PlayerNoise` | Footstep audio + noise emission flag |
+
+**Camera Rig:**
+
+| Camera | Role | Near Clip |
+|--------|------|-----------|
+| Main Camera | World geometry + environment | 0.3f |
+| Weapon Camera (child) | Tool models only (Weapon layer) | 0.01f |
+
+The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV cone check and the occlusion raycast, ensuring the visibility calculation matches what the player actually sees.
+
+---
+
+### Technical Architecture
+
+**Render Pipeline:** URP (Universal Render Pipeline). All custom shaders are written in Shader Graph or URP HLSL (`_BaseColor`, Render Face, etc.). No Built-In RP code.
+
+**Navigation:** Unity AI Navigation (NavMesh). Ghost states that use NavMesh: Wander, Investigate, Chase, Hide, Hidden. FLEE disables the agent and uses direct Transform movement.
+
+**Input:** Unity New Input System throughout. `PlayerNoise` reads `CharacterController.velocity` directly rather than polling input, so the noise system is decoupled from input binding.
+
+**Custom Layers:**
+
+| Layer | Purpose |
+|-------|---------|
+| `Walls` | All level geometry — used by vision + hearing raycasts |
+| `Weapon` | Lantern and vacuum models — excluded from Main Camera, rendered only by Weapon Camera |
+
+**Script Catalog:**
+
+| Script | Location | Purpose |
+|--------|----------|---------|
+| `GhostAI.cs` | `Assets/Scripts/` | 7-state FSM ghost brain |
+| `ScaredMeter.cs` | `Assets/Scripts/` | Player fear meter |
+| `EctoplasmProjectile.cs` | `Assets/Scripts/` | Parabolic arc projectile |
+| `VacuumTool.cs` | `Assets/Scripts/` | Vacuum weapon |
+| `Vacuumable.cs` | `Assets/Scripts/` | Universal vacuum target component |
+| `GhostManager.cs` | `Assets/Scripts/` | Singleton ghost counter + win trigger |
+| `LanternTool.cs` | `Assets/Scripts/` | Toggle spotlight + audio |
+| `PlayerNoise.cs` | `Assets/Scripts/` | Footstep audio + noise emission |
+| `PlayerInteractor.cs` | `Assets/Scripts/` | E-press SphereCast interaction |
+| `PlayerKeys.cs` | `Assets/Scripts/` | HashSet key inventory |
+| `InteractableDoor.cs` | `Assets/Scripts/` | IInteractable door — key check + destroy |
+| `IInteractable.cs` | `Assets/Scripts/` | Interface: GetPrompt + Interact |
+| `ToolChanger.cs` | `Assets/Package/` | Tool switching + HUD sync |
+| `ToolSwitcher.cs` | `Assets/Scripts/` | Early tool switcher (reference) |
+| `VacuumableSetup.cs` | `Assets/Editor/` | Editor batch-add/remove Vacuumable |
+| `GameEnding.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Win/lose fades + scene reload |
+| `LightFlicker.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Random/Curve atmospheric flicker |
+| `Observer.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Simple trigger-vision (Gargoyle only) |
+| `PlayerMovement.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Rigidbody movement for animated models |
+| `WaypointPatrol.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Basic waypoint loop (superseded by FSM) |
+| `MainMenu.cs` | `Assets/_3DStealthGame/…/Bonus Features/` | UIDocument main menu |
+| `Key.cs` | `Assets/_3DStealthGame/…/Bonus Features/` | Trigger key pickup → PlayerKeys |
+| `Door.cs` | `Assets/_3DStealthGame/…/Bonus Features/` | Legacy collision door (superseded) |
+
+---
+
+*AIPhobia — AI in Gaming, Second Semester*
