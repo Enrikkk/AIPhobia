@@ -349,9 +349,6 @@ All in-scene light prefabs (`Light.prefab`, `Flickering_Light.prefab`, `Candlest
   <i>Exploring the mansion in search of the ghosts — the lighting pass, footstep audio, and <code>PlayerNoise</code> all contribute to a stealth feel where careful movement matters. (The footstep audio is playing in-engine but cannot be heard here, since GIFs are silent — run the game to hear it.)</i>
 </p>
 
-**`LightFlicker.cs`:**
-Atmospheric lights use a two-mode flicker component. In **Random mode**, intensity snaps to a random value within a configurable range at a configurable interval. In **AnimationCurve mode**, intensity follows a designer-authored curve looped over time. The component drives both the Light component's intensity and the mesh renderer's emission color in lockstep, so there is no mismatch between the visible flame and the cast light. A custom Inspector hides the irrelevant controls depending on which mode is selected.
-
 **Fog Shaders:**
 Two Shader Graph assets (`FogPlane.shadergraph`, `FogSphere.shadergraph`) produce animated scrolling fog with noise-based turbulence and an orange-yellow color. `FogPlane` uses Render Face: Front for flat ground fog around the map exterior. `FogSphere` uses Render Face: Back to render from inside a sky dome sphere — the viewer is inside the dome looking out at the fog walls.
 
@@ -366,10 +363,7 @@ Lantern and vacuum models are assigned to the `Weapon` layer. The Main Camera's 
 
 ### UI System
 
-AIPhobia uses two distinct UI technologies: **Unity UI Toolkit** (UIDocument + UXML + USS) for the end screens, and **uGUI Canvas** for the in-game HUD.
-
-**Win / Lose Screens:**
-`GameEnding.cs` queries the UIDocument for `EndScreen` (win) and `CaughtScreen` (lose) VisualElements. On trigger, the appropriate element fades in over `fadeDuration` seconds while the matching audio sting plays. A visible in-game timer (`Demo_TimerLabel`) tracks elapsed play time and is shown on the end screen.
+The in-game HUD is built on Unity's **uGUI Canvas** system. Every element below is driven directly by one of the scripts we wrote — no pre-baked Inspector wiring carries the gameplay state, just runtime updates from our components.
 
 **In-Game HUD (Canvas):**
 | Element | Script | Notes |
@@ -441,7 +435,7 @@ The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV 
 | `Walls` | All level geometry — used by vision + hearing raycasts |
 | `Weapon` | Lantern and vacuum models — excluded from Main Camera, rendered only by Weapon Camera |
 
-**Script Catalog:**
+**Script Catalog (scripts authored for AIPhobia):**
 
 | Script | Location | Purpose |
 |--------|----------|---------|
@@ -460,13 +454,6 @@ The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV 
 | `ToolChanger.cs` | `Assets/Package/` | Tool switching + HUD sync |
 | `ToolSwitcher.cs` | `Assets/Scripts/` | Early tool switcher (reference) |
 | `VacuumableSetup.cs` | `Assets/Editor/` | Editor batch-add/remove Vacuumable |
-| `GameEnding.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Win/lose fades + scene reload |
-| `LightFlicker.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Random/Curve atmospheric flicker |
-| `Observer.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Simple trigger-vision (Gargoyle only) |
-| `PlayerMovement.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Rigidbody movement for animated models |
-| `WaypointPatrol.cs` | `Assets/_3DStealthGame/…/Demo_Scripts/` | Basic waypoint loop (superseded by FSM) |
-| `Key.cs` | `Assets/_3DStealthGame/…/Bonus Features/` | Trigger key pickup → PlayerKeys |
-| `Door.cs` | `Assets/_3DStealthGame/…/Bonus Features/` | Legacy collision door (superseded) |
 
 ---
 
