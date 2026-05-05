@@ -60,6 +60,37 @@ Let your Scared Bar fill up completely. The bar has a maximum of **1300 fear uni
 
 ---
 
+## Getting Started
+
+### Requirements
+
+- **Unity 6000.3.5f2** (Unity 6). Newer Unity 6 patch releases will likely open the project but will trigger an "upgrade" prompt — accept at your own risk.
+- Any platform supported by Unity 6 (Windows / macOS / Linux Editor).
+- Roughly 5 GB of free disk space once Unity has imported all assets and built the `Library/` cache.
+
+### Clone and open
+
+```bash
+git clone https://github.com/Enrikkk/AIPhobia.git
+cd AIPhobia
+```
+
+Open the cloned folder from **Unity Hub → Open → Add project from disk**. Unity will spend a minute regenerating the local `Library/` folder on first open — this is normal and is not committed to the repo.
+
+### Run the game in the Editor
+
+1. In the **Project** window, navigate to `Assets/_3DStealthGame/Tutorial_Demo/Demo_Scenes/`.
+2. Double-click **`DemoScene.unity`** to load it.
+3. Press the **Play** button at the top of the Editor.
+
+The game runs entirely from this scene — no main menu, no scene chaining. Lose by letting the Scared Bar fill up; win by vacuuming every ghost on the map down to 0 HP.
+
+### Build a standalone executable
+
+`File → Build Settings → Add Open Scenes → Build`. The build target defaults to the Editor's current platform; switch via the platform list inside Build Settings if you want a different target.
+
+---
+
 ## Features
 
 ### Ghost AI — 7-State Finite State Machine
