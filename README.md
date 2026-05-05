@@ -1,7 +1,7 @@
 # AIPhobia
 
 **Developer:** Enrique Hernández Noguera
-**Course:** AI in Gaming — Second Semester
+**Course:** AI in Gaming
 **Engine:** Unity (URP, NavMesh, New Input System, Cinemachine, TextMesh Pro)
 
 <p align="center">
@@ -467,4 +467,4 @@ Every feature, every state of the FSM, every system documented above — chained
 
 ---
 
-*AIPhobia — AI in Gaming, Second Semester*
+*AIPhobia — AI in Gaming*
