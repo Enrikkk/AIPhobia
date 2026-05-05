@@ -5,6 +5,7 @@
 **Engine:** Unity (URP, NavMesh, New Input System, Cinemachine, TextMesh Pro)
 
 ![AIPhobia — corridor lit only by the player's lantern](visuals/scene_at_corridor_flashlight.png)
+*The mansion at night — the player's lantern is the only meaningful light source, and the darkness hides everything (and everyone) else.*
 
 ---
 
@@ -17,6 +18,7 @@ The art style deliberately echoes classic *Ghostbusters* — low-poly geometry, 
 The ghost is driven entirely by a handwritten Finite State Machine. It patrols when idle, investigates sounds when the player makes noise, gives chase on line-of-sight, hurls glowing ectoplasm when close enough, and phases through walls to flee when threatened. The player's only weapon is the vacuum — but the ghost fights back.
 
 ![Top-down view of the haunted mansion layout](visuals/whole_map_from_above.png)
+*Top-down overview of the haunted mansion — multiple rooms, corridors, and locked doors connecting them.*
 
 ---
 
@@ -45,6 +47,7 @@ Let your Scared Bar fill up completely. The bar has a maximum of **1300 fear uni
 | `E` | Interact (pick up keys, open doors) |
 
 ![Hotbar HUD — three tool slots with the active slot highlighted](visuals/toolbar.png)
+*The hotbar HUD — three tool slots, the active one tinted brighter so the player always knows what they are holding.*
 
 ---
 
@@ -55,6 +58,7 @@ Let your Scared Bar fill up completely. The bar has a maximum of **1300 fear uni
 The ghost brain (`GhostAI.cs`) is a handwritten FSM with seven distinct behavioral states. Each state has its own update loop, its own transition conditions, and in some cases its own NavMesh speed and movement mode.
 
 ![Player POV — face to face with the ghost](visuals/in_front_of_ghost.png)
+*Face-to-face encounter — once the ghost crosses the player's vision cone the FSM jumps from Wander straight into Chase.*
 
 **States and Transitions:**
 
@@ -83,8 +87,9 @@ At low health (below 25% by default), the ghost navigates to a distant corner of
 **Vacuum Latch:**
 `isBeingVacuumed` is a computed property rather than a flag: it returns true if `(Time.time - lastVacuumedTime) < vacuumLatchTime` (default **0.2s**). This means the ghost reacts to being vacuumed for a fraction of a second after the vacuum leaves it, preventing one-frame flicker between states.
 
-[![▶ Watch: ghosts attack with ectoplasm and flee through walls](visuals/in_front_of_ghost.png)](visuals/ghosts_come_throw_ectoplasm_and_escape_through_wall.mp4)
-*Click to watch the FSM in action — ghosts approach, throw ectoplasm in the Spook state, then enter Flee and phase straight through walls to escape.*
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/ghosts_come_throw_ectoplasm_and_escape_through_wall.mp4" controls width="720"></video>
+
+*The FSM in action — ghosts approach, throw ectoplasm during Spook, then enter Flee and phase straight through walls to escape.*
 
 ---
 
@@ -109,6 +114,7 @@ The player's fear level is tracked by `ScaredMeter.cs`, a MonoBehaviour on the P
 The bar uses a two-layer Canvas pattern. `ScaredBar_BG` is a static decorative image (custom art, transparent background). `ScaredBar_Fill` sits on top with `Image Type: Filled, Fill Method: Horizontal, Origin: Left`. `ScaredMeter.UpdateBar()` sets `fillAmount = currentFear / maxFear` every frame. The fill color visually communicates danger level.
 
 ![Scared Bar HUD element — orange fill over decorative frame](visuals/scaredbar.png)
+*The two-layer fear meter — a static decorative frame with an orange `Image Type: Filled` layer driven by `fillAmount = currentFear / maxFear` every frame.*
 
 ---
 
@@ -125,8 +131,9 @@ The projectile computes its trajectory in `Update()` using a parametric approach
 **Prefab:**
 The projectile is a green emissive sphere (URP Lit material with emission enabled). The `targetMeter` reference is assigned at runtime by GhostAI when the projectile is instantiated — the Inspector field is left blank in the prefab.
 
-[![▶ Watch: ghost throwing ectoplasm](visuals/in_front_of_ghost.png)](visuals/ghost_throwing_ectoplasm.mp4)
-*Side-angle view of the parabolic ectoplasm arc as the ghost releases it from `ThrowOrigin`.*
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/ghost_throwing_ectoplasm.mp4" controls width="720"></video>
+
+*Side-angle view of the parabolic ectoplasm arc — the projectile launches from `ThrowOrigin` and rises and falls along a `Sin(t * PI)` curve.*
 
 ---
 
@@ -135,9 +142,11 @@ The projectile is a green emissive sphere (URP Lit material with emission enable
 The vacuum (`VacuumTool.cs`) is the player's only weapon and the central mechanical loop of the game. Left-click fires a continuous beam; releasing stops it.
 
 ![Vacuum tool firing in first person](visuals/vacuuming.png)
+*The vacuum firing in first person — procedural shake, motor audio ramp, and a particle suction cone all driven by the same `currentShakeWeight` value.*
 
-[![▶ Watch: vacuum sucking up props](visuals/vacuuming.png)](visuals/vacuuming_objects.mp4)
-*Click the image above to watch the vacuum interacting with physics-enabled props.*
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/vacuuming_objects.mp4" controls width="720"></video>
+
+*Vacuum interacting with physics-enabled props — `Vacuumable.GetVacuumed()` calls `Rigidbody.AddForce` for objects with mass, dragging them across the floor.*
 
 **Targeting:**
 Each frame while active, a raycast fires from the camera center forward up to `suctionRange` (10f). If the ray hits a collider with a `Vacuumable` component, `GetVacuumed(vacuumModel.position, suctionPower, distanceMult)` is called. The distance multiplier is normalized: 1.0 at point-blank, decreasing toward zero at max range, so the vacuum is strongest when you are close.
@@ -180,6 +189,7 @@ A custom menu under `AIPhobia/` in the Unity Editor lets you batch-convert any s
 `LanternTool.cs` manages a toggleable spotlight carried by the player.
 
 ![Lantern lighting up a dim corridor](visuals/flashlight_image_again.png)
+*The lantern lighting a dim corridor — the toggleable spotlight is the player's only reliable way of seeing more than a few meters ahead.*
 
 Left-clicking while the lantern is equipped toggles the spotlight on or off. Each toggle plays a distinct `PlayOneShot` audio clip — `flashlight_click_on.mp3` or `flashlight_click_off.mp3` — without interrupting any ambient audio loops.
 
@@ -210,9 +220,11 @@ The lantern model (along with the vacuum model) is assigned to a custom **Weapon
 The interaction system is built around a small interface pattern that makes any object in the scene interactable with a single E keypress.
 
 ![The final locked door — requires a key picked up earlier in the run](visuals/final_door.png)
+*The final locked door — `InteractableDoor` checks `PlayerKeys.OwnKey(requiredKey)` and only accepts the player's E-press if they are carrying the matching key.*
 
-[![▶ Watch: obtaining the final key](visuals/final_door.png)](visuals/obtain_the_final_key.mp4)
-*Click to watch the player track down and pick up the final key.*
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/obtain_the_final_key.mp4" controls width="720"></video>
+
+*Tracking down and picking up the final key — the trigger volume on the key calls `PlayerKeys.AddKey()` via `GetComponentInParent`, then destroys itself.*
 
 **`IInteractable` Interface:**
 ```
@@ -269,8 +281,13 @@ A `TextMeshProUGUI` component (font: `Eater-Regular SDF` for thematic styling) d
 **Singleton Guard:**
 `Awake()` checks whether an `Instance` already exists. If one does (e.g., from a scene reload), the duplicate destroys itself immediately.
 
-[![▶ Watch: ghost counter ticking down on a kill](visuals/vacuuming.png)](visuals/vacuum_ghost_and_reduce_ghost_number_label.mp4)
-*Click to watch a ghost being vacuumed to 0 HP, triggering `Vacuumable.Die()` → `GhostManager.RemoveGhost()` → counter HUD decrement.*
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/vacuum_ghost_and_reduce_ghost_number_label.mp4" controls width="720"></video>
+
+*A ghost being vacuumed to 0 HP — `Vacuumable.Die()` → `GhostManager.RemoveGhost()` → the "Ghosts Left" HUD counter ticks down by one.*
+
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/open_the_final_door_and_fight_ghosts.mp4" controls width="720"></video>
+
+*Climactic encounter — opening the final locked door and fighting the remaining ghosts. When the last counter hits zero, `GhostManager` fires `GameEnding.WinGame()` and the win screen takes over.*
 
 ---
 
@@ -285,6 +302,11 @@ All rooms originally had open tops. Ceilings were added by duplicating each floo
 All in-scene light prefabs (`Light.prefab`, `Flickering_Light.prefab`, `Candlestick.prefab`) had their intensities significantly reduced. The Environment Lighting Source was switched away from the default skybox (which was acting as ambient and pouring daylight-level blue through every window opening) to a dark cool ambient color. The result is a house where most corridors are in near-total darkness, pools of candlelight are isolated and meaningful, and the player's lantern feels genuinely necessary.
 
 ![Atmosphere shot — dim corridor lit by the lantern](visuals/scene_at_corridor_flashlight2.png)
+*Alternate corridor angle — most of the house sits in near-total darkness; pools of candlelight stay small and isolated.*
+
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/traverse_mansion_searching%20for_ghosts.mp4" controls width="720"></video>
+
+*Exploring the mansion in search of the ghost — the lighting pass, footstep audio, and `PlayerNoise` all contribute to a stealth feel where careful movement matters.*
 
 **`LightFlicker.cs`:**
 Atmospheric lights use a two-mode flicker component. In **Random mode**, intensity snaps to a random value within a configurable range at a configurable interval. In **AnimationCurve mode**, intensity follows a designer-authored curve looped over time. The component drives both the Light component's intensity and the mesh renderer's emission color in lockstep, so there is no mismatch between the visible flame and the cast light. A custom Inspector hides the irrelevant controls depending on which mode is selected.
@@ -407,18 +429,11 @@ The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV 
 
 ---
 
-## Gameplay Showcase
+## Full Playthrough
 
-Click any thumbnail to play the clip in GitHub's video viewer.
+<video src="https://github.com/Enrikkk/AIPhobia/raw/main/visuals/complete_gameplay_compressed.mp4" controls width="720"></video>
 
-[![▶ Traversing the mansion in search of ghosts](visuals/scene_at_corridor_flashlight.png)](visuals/traverse_mansion_searching%20for_ghosts.mp4)
-*Exploring the mansion — atmosphere, lantern, footstep noise, and the ghost reacting to your movement.*
-
-[![▶ Final door + ghost fight](visuals/final_door.png)](visuals/open_the_final_door_and_fight_ghosts.mp4)
-*Opening the final door and engaging the ghost in the climactic fight.*
-
-[![▶ Complete gameplay run](visuals/in_front_of_ghost.png)](visuals/complete_gameplay_compressed.mp4)
-*Full end-to-end gameplay run, start to win screen.*
+*A complete end-to-end gameplay run — from the first lit corridor to the final ghost vacuumed and the win screen.*
 
 ---
 
