@@ -151,7 +151,7 @@ The projectile is a green emissive sphere (URP Lit material with emission enable
 <p align="center">
   <img src="visuals/gifs/ghost_throwing_ectoplasm.gif" alt="Side-angle view of a ghost throwing an ectoplasm projectile in a parabolic arc" width="100%">
   <br>
-  <i>Side-angle view of the parabolic ectoplasm arc — the projectile launches from <code>ThrowOrigin</code> and rises and falls along a <code>Sin(t * PI)</code> curve.</i>
+  <i>Side-angle view of the parabolic ectoplasm arc — the projectile launches from <code>ThrowOrigin</code> and rises and falls along a <code>Sin(t * PI)</code> curve. The cylinder the ghost is aiming at is the player: AIPhobia is first-person and has no body mesh, so from the outside the player reads as just the floating tool model they are holding.</i>
 </p>
 
 ---
@@ -322,7 +322,7 @@ A `TextMeshProUGUI` component (font: `Eater-Regular SDF` for thematic styling) d
 <p align="center">
   <img src="visuals/gifs/open_the_final_door_and_fight_ghosts.gif" alt="Opening the final door and fighting the remaining ghosts" width="100%">
   <br>
-  <i>Climactic encounter — opening the final locked door and fighting the remaining ghosts. When the last counter hits zero, <code>GhostManager</code> fires <code>GameEnding.WinGame()</code> and the win screen takes over.</i>
+  <i>Climactic encounter — opening the final locked door and engaging the remaining ghosts inside. The clip stops mid-fight; in a successful run, when the last counter hits zero, <code>GhostManager</code> fires <code>GameEnding.WinGame()</code> and the win screen takes over.</i>
 </p>
 
 ---
@@ -346,7 +346,7 @@ All in-scene light prefabs (`Light.prefab`, `Flickering_Light.prefab`, `Candlest
 <p align="center">
   <img src="visuals/gifs/traverse_mansion_searching_for_ghosts.gif" alt="Exploring the mansion in search of the ghost" width="100%">
   <br>
-  <i>Exploring the mansion in search of the ghost — the lighting pass, footstep audio, and <code>PlayerNoise</code> all contribute to a stealth feel where careful movement matters.</i>
+  <i>Exploring the mansion in search of the ghosts — the lighting pass, footstep audio, and <code>PlayerNoise</code> all contribute to a stealth feel where careful movement matters. (The footstep audio is playing in-engine but cannot be heard here, since GIFs are silent — run the game to hear it.)</i>
 </p>
 
 **`LightFlicker.cs`:**
@@ -470,13 +470,13 @@ The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV 
 
 ---
 
-## Full Playthrough
+## And Here Is a Complete Gameplay of AIPhobia
 
-A complete end-to-end gameplay run is included in the repo as a 4-minute video — from the first lit corridor to the final ghost vacuumed and the win screen.
+Every feature, every state of the FSM, every system documented above — chained together into a single end-to-end run. From the first lit corridor through every locked door, every ectoplasm dodge, every vacuum suction, all the way to the final ghost vacuumed and the win screen.
 
-**Download / view the full run:** [`visuals/complete_gameplay_compressed.mp4`](visuals/complete_gameplay_compressed.mp4) *(45 MB, 4:18)*
+**▶ Watch the full playthrough:** [`visuals/complete_gameplay_compressed.mp4`](visuals/complete_gameplay_compressed.mp4) *(45 MB, 4:18)*
 
-> The run is too long to render as an inline GIF without bloating the README; the per-feature GIFs above already cover every system the playthrough demonstrates. Click the link to download or open in GitHub's video viewer.
+> Click the link to play or download the full run. It is included as a video rather than a GIF because a 4-minute GIF would balloon to several hundred megabytes — the per-feature GIFs above already animate every individual system this run demonstrates.
 
 ---
 
