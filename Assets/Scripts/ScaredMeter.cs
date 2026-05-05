@@ -8,10 +8,11 @@ public class ScaredMeter : MonoBehaviour
     public float passiveRate      = 4f;
     public float ghostVisibleRate = 8f;
     public float vacuumDrainRate  = 7f;
+    private float currentFear = 100f; // Initial fear defined here (avoids using a different variable)
+    [SerializeField] private float maxFear = 1550f;
 
     [Header("Instant Events")]
     public float ectoplasmHit      = 150f;
-    public float physicalCatchFill = 1000f;
 
     [Header("References")]
     public Image     scaredBarImage;
@@ -20,8 +21,6 @@ public class ScaredMeter : MonoBehaviour
     public LayerMask environmentMask;
     public GameEnding gameEnding;
 
-    private float currentFear = 100f; // Initial fear defined here (avoids using a different variable)
-    private const float maxFear = 1300f;
     private bool gameover = false;
 
     void Update()
