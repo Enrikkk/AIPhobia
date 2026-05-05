@@ -50,7 +50,7 @@ Let your Scared Bar fill up completely. The bar has a maximum of **1300 fear uni
 | `3` | Equip third tool slot |
 | `Mouse Wheel` | Cycle through tools |
 | Press active tool key again | Deselect tool (empty hands) |
-| `E` | Interact (pick up keys, open doors) |
+| `E` | Open the door you are looking at (only succeeds if you already own its matching key) |
 
 <p align="center">
   <img src="visuals/toolbar.png" alt="Hotbar HUD — three tool slots with the active slot highlighted" width="60%">
@@ -120,7 +120,7 @@ The player's fear level is tracked by `ScaredMeter.cs`, a MonoBehaviour on the P
 | Ectoplasm projectile hit | +150 fear (instant) |
 | Ghost kill reward | −`killFearReduction` (one-shot on ghost death, default tuned in Inspector) |
 
-**`CanPlayerSeeGhost()`** is called every frame to determine whether the visibility bonus applies. It performs a two-part check: the ghost must be within the player camera's forward FOV cone AND an unobstructed raycast from the camera to the ghost must succeed (using the Walls layer mask). If either fails, the visibility bonus is not applied.
+**`CanPlayerSeeGhost()`** is called every frame to determine whether the visibility bonus applies. It performs a two-part check: the ghost must be within the player camera's forward FOV cone AND an unobstructed raycast from the camera to the ghost must succeed (using the Environment layer mask). If either fails, the visibility bonus is not applied.
 
 **Game Over:** When `currentFear >= maxFear` (1300), `ScaredMeter` sets a `gameover` flag to prevent double-triggers and calls `gameEnding.CaughtPlayer()`.
 
@@ -222,7 +222,7 @@ Left-clicking while the lantern is equipped toggles the spotlight on or off. Eac
 
 Because the entire Lantern GameObject is enabled/disabled by the `ToolChanger` when switching tools, the spotlight child naturally inherits its parent's disabled state when the tool is put away. When the lantern is re-equipped, it restores whichever on/off state it was in — the light remembers where it left off without any extra state management.
 
-The lantern model (along with the vacuum model) is assigned to a custom **Weapon layer** so it can be rendered by the dedicated Weapon Camera with a very close near clip plane. This prevents the cylindrical clipping artifact that occurs when first-person tool models get too close to a camera with a standard near plane.
+The lantern model (along with the vacuum model) is assigned to a custom **Player layer** so it can be rendered by the dedicated Weapon Camera with a very close near clip plane. This prevents the cylindrical clipping artifact that occurs when first-person tool models get too close to a camera with a standard near plane.
 
 ---
 
@@ -245,6 +245,10 @@ The lantern model (along with the vacuum model) is assigned to a custom **Weapon
 ### Key & Door Interaction System
 
 The interaction system is built around a small interface pattern that makes any object in the scene interactable with a single E keypress.
+
+**Player flow:**
+1. **Keys are picked up automatically on contact.** Walking into a key adds its name to the player's inventory — no input required.
+2. **Doors require both ownership and an E-press.** Looking at a locked door shows a prompt: `[E] Locked` if the player does not yet own the matching key, `[E] Open` once they do. Pressing E with the matching key in inventory removes the door.
 
 <p align="center">
   <img src="visuals/final_door.png" alt="The final locked door — requires a key picked up earlier in the run" width="100%">
@@ -352,12 +356,12 @@ All in-scene light prefabs (`Light.prefab`, `Flickering_Light.prefab`, `Candlest
 **Fog Shaders:**
 Two Shader Graph assets (`FogPlane.shadergraph`, `FogSphere.shadergraph`) produce animated scrolling fog with noise-based turbulence and an orange-yellow color. `FogPlane` uses Render Face: Front for flat ground fog around the map exterior. `FogSphere` uses Render Face: Back to render from inside a sky dome sphere — the viewer is inside the dome looking out at the fog walls.
 
-**Dual-Camera Weapon Rendering:**
+**Dual-Camera First-Person Tool Rendering:**
 First-person tool models need a very close near clip plane (0.01f) to avoid showing geometry cutoffs right in front of the camera. The world camera, however, needs a larger near plane (0.3f) for adequate Z-buffer precision across the full scene depth. The solution is two cameras on the same rig:
-- **Main Camera** renders everything except the **Weapon** layer. Near clip: **0.3f**.
-- **Weapon Camera** (child of Main Camera) renders only the **Weapon** layer. Clear Flags: Depth Only. Depth: Main+1. Near clip: **0.01f**.
+- **Main Camera** renders everything except the **Player** layer. Near clip: **0.3f**.
+- **Weapon Camera** (child of Main Camera) renders only the **Player** layer. Clear Flags: Depth Only. Depth: Main+1. Near clip: **0.01f**.
 
-Lantern and vacuum models are assigned to the `Weapon` layer. The Main Camera's culling mask excludes it. The two cameras composite automatically — tools render crisply at any distance without any clipping artifact.
+Lantern and vacuum models are assigned to the `Player` layer. The Main Camera's culling mask excludes it. The two cameras composite automatically — tools render crisply at any distance without any clipping artifact.
 
 ---
 
@@ -414,7 +418,7 @@ The player is built on Unity's **Starter Assets FirstPersonController**, which u
 | Camera | Role | Near Clip |
 |--------|------|-----------|
 | Main Camera | World geometry + environment | 0.3f |
-| Weapon Camera (child) | Tool models only (Weapon layer) | 0.01f |
+| Weapon Camera (child) | Tool models only (Player layer) | 0.01f |
 
 The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV cone check and the occlusion raycast, ensuring the visibility calculation matches what the player actually sees.
 
@@ -432,8 +436,9 @@ The `ScaredMeter`'s `CanPlayerSeeGhost()` uses the Main Camera for both the FOV 
 
 | Layer | Purpose |
 |-------|---------|
-| `Walls` | All level geometry — used by vision + hearing raycasts |
-| `Weapon` | Lantern and vacuum models — excluded from Main Camera, rendered only by Weapon Camera |
+| `Environment` | All level geometry — used by vision and hearing raycasts to determine line-of-sight and occlusion |
+| `Ghost` | The ghost AI agents — kept on a dedicated layer so other systems can filter for them when needed |
+| `Player` | First-person tool models (lantern, vacuum) — excluded from the Main Camera, rendered only by the Weapon Camera with its 0.01f near clip plane |
 
 **Script Catalog (scripts authored for AIPhobia):**
 
